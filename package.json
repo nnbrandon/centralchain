@@ -1,0 +1,28 @@
+{
+	"name": "blockchain-js",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "jest --watchAll"
+	},
+	"jest": {
+		"testEnvironment": "node"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mrnguuyen/blockchain-js.git"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/mrnguuyen/blockchain-js/issues"
+	},
+	"homepage": "https://github.com/mrnguuyen/blockchain-js#readme",
+	"devDependencies": {
+		"install": "^0.13.0",
+		"jest": "^25.1.0",
+		"npm": "^6.14.1"
+	}
+}

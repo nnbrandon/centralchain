@@ -1,0 +1,1 @@
+A centralized full stack blockchain to demonstrate practices and learnings.
