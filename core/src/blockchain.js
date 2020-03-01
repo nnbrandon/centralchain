@@ -19,9 +19,16 @@ class Blockchain {
 		for (let i = 1; i < chain.length; i++) {
 			const { timestamp, lastHash, hash, data, nonce, difficulty } = chain[i];
 			const actualLastHash = chain[i - 1].hash;
+			const lastDifficulty = chain[i - 1].difficulty;
 
 			// check if current block's lastHash matches the chain's block's last hash
 			if (lastHash !== actualLastHash) {
+				return false;
+			}
+
+			// check to make sure that the previous block's difficulty was not tampered with.
+			// someone can slow down the blockchain or make it very easy to mine
+			if (Math.abs(lastDifficulty - difficulty > 1)) {
 				return false;
 			}
 
