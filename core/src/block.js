@@ -47,7 +47,7 @@ class Block {
 		const { difficulty } = originalBlock;
 		const difference = timestamp - originalBlock.timestamp;
 
-		if (difficulty < 0) {
+		if (difficulty < 1) {
 			return 1;
 		}
 
