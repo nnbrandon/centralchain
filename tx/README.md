@@ -20,12 +20,12 @@ Notes on correct implementation from Mastering Bitcoin
         // amount sent to Bob
         {
             "value": 0.0150000,
-            "scriptPubKey":
+            "scriptPubKey": "Bob's address"
         },
         // change for alice
         {
             "value": 0.08450000,
-            "scriptPubKey":
+            "scriptPubKey": "Alice's address"
         }
     ]
 }
