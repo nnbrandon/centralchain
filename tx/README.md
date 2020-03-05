@@ -28,3 +28,5 @@ Notes on correct implementation from Mastering Bitcoin
     ]
 }
 ```
+
+![alt text](./transaction-alice-bob.png)
