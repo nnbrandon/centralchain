@@ -17,10 +17,12 @@ Notes on correct implementation from Mastering Bitcoin
         }
     ],
     "vout" (output): [
+        // amount sent to Bob
         {
             "value": 0.0150000,
             "scriptPubKey":
         },
+        // change for alice
         {
             "value": 0.08450000,
             "scriptPubKey":
