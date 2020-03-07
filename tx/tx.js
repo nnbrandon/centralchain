@@ -1,21 +1,22 @@
 const uuid = require('uuid/v1');
-const { verifySignature } = require('../../crypto/src/elliptic-curve');
+const { verifySignature } = require('../crypto/elliptic-curve');
+const { REWARD_INPUT, MINING_REWARD } = require('./config');
 
-// Transaction contains proof of ownership for each
-// amount of bitcoin (inputs) whose value is being spent,
-// in the form of a digital signature from the owner,
-// which can be independently validated by anyone.
+/**
+ * This version of Transaction contains a single input JSON object and
+ * a map for the output. 
+ * @param senderWallet sender's wallet which generates a signature
+ * @param recipient recipient's address
+ * @param amount cryptocurrency amount
+ * @param outputMap map containing details of transactions with how much recipient received and past transactions
+ */
 class Transaction {
-	constructor(senderWallet, recipient, amount) {
+	constructor(senderWallet, recipient, amount, outputMap, input) {
 		this.id = uuid();
-		this.outputMap = this.createOutputMap(senderWallet, recipient, amount);
-		this.input = this.createInput(senderWallet, this.outputMap);
+		this.outputMap = outputMap || this.createOutputMap(senderWallet, recipient, amount);
+		this.input = input || this.createInput(senderWallet, this.outputMap);
 	}
 
-	// details sent to the recipient
-	// details of the current transaction go in here
-	// details of past transactions are stored inside of outputMap
-	// "To Bob" as an entry
 	createOutputMap(senderWallet, recipient, amount) {
 		const outputMap = {};
 
@@ -25,9 +26,6 @@ class Transaction {
 		return outputMap;
 	}
 
-	// inputs from latest transaction correspond to
-	// outputs from previous transactions.
-	// "From Alice, signed by Alice"
 	createInput(senderWallet, outputMap) {
 		// senderWallet to generate a signature
 		// outputMap is used as data to sign the signature
@@ -75,6 +73,11 @@ class Transaction {
 		}
 
 		return true;
+	}
+
+	static rewardTransaction(minerWallet) {
+		const newOutputMap = { [minerWallet.publicKey]: MINING_REWARD };
+		return new this(undefined, undefined, undefined, newOutputMap, REWARD_INPUT);
 	}
 }
 

@@ -1,6 +1,7 @@
-const Transaction = require('../src/tx');
-const Wallet = require('../../wallet/src/wallet');
-const { verifySignature } = require('../../crypto/src/elliptic-curve');
+const Transaction = require('./tx');
+const Wallet = require('../wallet/wallet');
+const { verifySignature } = require('../crypto/elliptic-curve');
+const { REWARD_INPUT, MINING_REWARD } = require('./config');
 
 describe('Transaction', () => {
 	let transaction;
@@ -153,6 +154,22 @@ describe('Transaction', () => {
 					transaction.update(senderWallet, 'foo', 99999999);
 				}).toThrow('Amount exceeds balance');
 			});
+		});
+	});
+	describe('rewardTransaction()', () => {
+		let rewardTransaction, minerWallet;
+
+		beforeEach(() => {
+			minerWallet = new Wallet();
+			rewardTransaction = Transaction.rewardTransaction(minerWallet);
+		});
+
+		it('creates a transaction with the reward input', () => {
+			expect(rewardTransaction.input).toEqual(REWARD_INPUT);
+		});
+
+		it('creates one transaction for the miner with the `MINING_REWARD`', () => {
+			expect(rewardTransaction.outputMap[minerWallet.publicKey]).toEqual(MINING_REWARD);
 		});
 	});
 });

@@ -1,5 +1,5 @@
 const Block = require('./block');
-const cryptoHash = require('../../crypto/src/crypto-hash');
+const cryptoHash = require('../crypto/crypto-hash');
 
 class Blockchain {
 	constructor() {
@@ -41,7 +41,7 @@ class Blockchain {
 		return true;
 	}
 
-	replaceChain(newChain) {
+	replaceChain(newChain, onSuccess) {
 		if (newChain.length <= this.chain.length) {
 			console.error('incoming chain must be longer');
 			return;
@@ -50,6 +50,10 @@ class Blockchain {
 		if (!Blockchain.isValidChain(newChain)) {
 			console.error('incoming chain must be valid');
 			return;
+		}
+
+		if (onSuccess) {
+			onSuccess();
 		}
 
 		this.chain = newChain;

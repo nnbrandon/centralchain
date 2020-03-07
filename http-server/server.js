@@ -1,10 +1,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fetch = require('node-fetch');
-const Blockchain = require('../core/src/blockchain');
+const Blockchain = require('../core/blockchain');
 const PubSub = require('./redis-pubsub/pubsub');
-const TransactionPool = require('../tx/src/tx-pool');
-const Wallet = require('../wallet/src/wallet');
+const TransactionPool = require('../tx/tx-pool');
+const Wallet = require('../wallet/wallet');
+const TransactionMiner = require('../miner/tx-miner');
 
 const DEFAULT_PORT = 8080;
 const app = express();
@@ -12,6 +13,7 @@ const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const pubsub = new PubSub(blockchain, transactionPool);
 const wallet = new Wallet();
+const transactionMiner = new TransactionMiner(blockchain, transactionPool, wallet, pubsub);
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 app.use(bodyParser.json());
@@ -22,6 +24,12 @@ app.get('/api/blocks', (req, res) => {
 
 app.get('/api/transaction-pool', (req, res) => {
 	res.json(transactionPool.transactionMap);
+});
+
+app.get('/api/mine-transactions', (req, res) => {
+	transactionMiner.mineTransactions();
+
+	res.redirect('/api/blocks');
 });
 
 app.post('/api/mine', (req, res) => {
@@ -41,7 +49,7 @@ app.post('/api/transaction', (req, res) => {
 		if (transaction) {
 			transaction.update(wallet, recipient, amount);
 		} else {
-			transaction = wallet.createTransaction(amount, recipient);
+			transaction = wallet.createTransaction(amount, recipient, blockchain.chain);
 		}
 	} catch (error) {
 		return res.status(400).json({ type: 'error', message: error.message });
