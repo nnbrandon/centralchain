@@ -27,7 +27,7 @@ class TransactionPool {
 		this.transactionMap = {};
 	}
 
-	clearChainTransactions(chain) {
+	clearCompletedTransactions(chain) {
 		for (let i = 1; i < chain.length; i++) {
 			const block = chain[i];
 

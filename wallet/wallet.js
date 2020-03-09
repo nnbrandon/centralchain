@@ -8,8 +8,9 @@ class Wallet {
 		this.balance = STARTING_BALANCE;
 
 		// private key used to generate signatures for private key owner of data
-		// public key allows others to sends crypto
 		this.keyPair = ec.genKeyPair();
+
+		// public key allows others to sends crypto
 		this.publicKey = this.keyPair.getPublic().encode('hex');
 	}
 
@@ -19,7 +20,7 @@ class Wallet {
 
 	createTransaction(amount, recipient, chain) {
 		if (chain) {
-			this.balance = Wallet.calculateBalance(chain, this.publicKey);
+			this.balance = this.calculateBalance(chain);
 		}
 
 		if (amount > this.balance) {
@@ -28,21 +29,27 @@ class Wallet {
 		return new Transaction(this, recipient, amount);
 	}
 
-	static calculateBalance(chain, address) {
+	calculateBalance(chain) {
+		let hasConductedTransaction = false;
 		let outputsTotal = 0;
 
-		for (let i = 1; i < chain.length; i++) {
+		for (let i = chain.length - 1; i > 0; i--) {
 			const block = chain[i];
 
 			for (let transaction of block.data) {
-				const outputValue = transaction.outputMap[address];
+				if (transaction.input.address === this.publicKey) {
+					hasConductedTransaction = true;
+				}
+				const outputValue = transaction.outputMap[this.publicKey];
 
 				if (outputValue) {
 					outputsTotal += outputValue;
 				}
 			}
+
+			if (hasConductedTransaction) break;
 		}
-		return STARTING_BALANCE + outputsTotal;
+		return hasConductedTransaction ? outputsTotal : STARTING_BALANCE + outputsTotal;
 	}
 }
 

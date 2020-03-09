@@ -52,7 +52,7 @@ describe('TransactionPool', () => {
 				}
 			}
 
-			transactionPool.clearChainTransactions(blockchain.chain);
+			transactionPool.clearCompletedTransactions(blockchain.chain);
 			expect(transactionPool.transactionMap).toEqual(expectedTransactionMap);
 		});
 	});

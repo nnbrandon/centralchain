@@ -32,6 +32,13 @@ app.get('/api/mine-transactions', (req, res) => {
 	res.redirect('/api/blocks');
 });
 
+app.get('/api/wallet', (req, res) => {
+	res.json({
+		address: wallet.publicKey,
+		balance: wallet.calculateBalance(blockchain.chain)
+	});
+});
+
 app.post('/api/mine', (req, res) => {
 	const { data } = req.body;
 

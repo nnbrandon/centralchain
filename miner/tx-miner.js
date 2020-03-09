@@ -1,4 +1,4 @@
-const Transaction = require('../../tx/tx');
+const Transaction = require('../tx/tx');
 
 class TransactionMiner {
 	constructor(blockchain, transactionPool, wallet, pubsub) {
