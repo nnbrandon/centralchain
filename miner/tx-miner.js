@@ -10,7 +10,7 @@ class TransactionMiner {
 
 	mineTransactions() {
 		// get the transaction pool's valid transactions
-		const validTransactions = this.transactionPool.validTransactions(); // array of valid transactions
+		const validTransactions = this.transactionPool.getValidTransactions(); // array of valid transactions
 
 		// generate miners reward
 		const rewardedTransaction = Transaction.rewardTransaction(this.wallet); // new Transaction object with reward to validator

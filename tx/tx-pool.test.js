@@ -35,7 +35,7 @@ describe('TransactionPool', () => {
 		});
 	});
 
-	describe('clearChainTransactions()', () => {
+	describe('clearMinedTransactions()', () => {
 		it('clears the pool of any existing blockchain transactions', () => {
 			const blockchain = new Blockchain();
 			const expectedTransactionMap = {};
@@ -52,7 +52,7 @@ describe('TransactionPool', () => {
 				}
 			}
 
-			transactionPool.clearCompletedTransactions(blockchain.chain);
+			transactionPool.clearMinedTransactions(blockchain.chain);
 			expect(transactionPool.transactionMap).toEqual(expectedTransactionMap);
 		});
 	});

@@ -27,7 +27,7 @@ class TransactionPool {
 		this.transactionMap = {};
 	}
 
-	clearCompletedTransactions(chain) {
+	clearMinedTransactions(chain) {
 		for (let i = 1; i < chain.length; i++) {
 			const block = chain[i];
 
@@ -39,7 +39,7 @@ class TransactionPool {
 		}
 	}
 
-	validTransactions() {
+	getValidTransactions() {
 		return Object.values(this.transactionMap).filter((transaction) => Transaction.validTransaction(transaction));
 	}
 }
