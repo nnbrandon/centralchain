@@ -55,6 +55,8 @@ class Transaction {
 		this.input = this.createInput(senderWallet, this.outputMap);
 	}
 
+	// check and make sure that the transaction is valid by verifying the
+	// signature in the transaction
 	static validTransaction(transaction) {
 		const { input, outputMap } = transaction;
 		const { address, amount, signature } = input;
@@ -75,6 +77,7 @@ class Transaction {
 		return true;
 	}
 
+	// return a new transaction to reward miner
 	static rewardTransaction(minerWallet) {
 		const newOutputMap = { [minerWallet.publicKey]: MINING_REWARD };
 		return new this(undefined, undefined, undefined, newOutputMap, REWARD_INPUT);

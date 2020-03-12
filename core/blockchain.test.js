@@ -1,5 +1,7 @@
 const Blockchain = require('./blockchain');
 const Block = require('./block');
+const Transaction = require('../tx/tx');
+const Wallet = require('../wallet/wallet');
 const cryptoHash = require('../crypto/crypto-hash');
 
 describe('Blockchain', () => {
@@ -87,7 +89,8 @@ describe('Blockchain', () => {
 	describe('replaceChain()', () => {
 		describe('when the new chain is not longer', () => {
 			it('does not replace the chain', () => {
-				newChain.chain[0] = { data: 'new block' };
+				const transaction = new Wallet().createTransaction(50, 'foo');
+				newChain.chain[0] = [ transaction ];
 				blockchain.replaceChain(newChain.chain);
 				expect(blockchain.chain).toEqual(originalChain);
 			});
@@ -95,9 +98,13 @@ describe('Blockchain', () => {
 
 		describe('when the new chain is longer', () => {
 			beforeEach(() => {
-				newChain.addBlock('data1');
-				newChain.addBlock('data2');
-				newChain.addBlock('data3');
+				const transactionOne = new Wallet().createTransaction(50, 'foo');
+				const transactionTwo = new Wallet().createTransaction(50, 'foo');
+				const transactionThree = new Wallet().createTransaction(50, 'foo');
+				const transactionFour = new Wallet().createTransaction(50, 'foo');
+				newChain.addBlock([ transactionOne, transactionTwo ]);
+				newChain.addBlock([ transactionThree ]);
+				newChain.addBlock([ transactionFour ]);
 			});
 
 			describe('and the chain is invalid', () => {
@@ -113,6 +120,81 @@ describe('Blockchain', () => {
 					blockchain.replaceChain(newChain.chain);
 					expect(blockchain.chain).toEqual(newChain.chain);
 				});
+			});
+		});
+	});
+
+	describe('validTransactionData()', () => {
+		let transaction;
+		let rewardTransaction;
+		let wallet;
+
+		beforeEach(() => {
+			wallet = new Wallet();
+			transaction = wallet.createTransaction(50, 'foo-recipient');
+			rewardTransaction = Transaction.rewardTransaction(wallet);
+		});
+
+		describe('and the transaction data is valid', () => {
+			it('returns true', () => {
+				newChain.addBlock([ transaction, rewardTransaction ]);
+				expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(true);
+			});
+		});
+
+		describe('and the transaction data has multiple rewards', () => {
+			it('should return false', () => {
+				newChain.addBlock([ transaction, rewardTransaction, rewardTransaction ]);
+				expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(false);
+			});
+		});
+
+		describe('and the transaction data has at least one malformed outputMap', () => {
+			describe('and the transaction is not a reward transaction', () => {
+				it('should return false', () => {
+					transaction.outputMap[wallet.publicKey] = 9999999;
+					newChain.addBlock([ transaction, rewardTransaction ]);
+					expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(false);
+				});
+			});
+
+			describe('and the transaction is a reward transaction', () => {
+				it('should return false', () => {
+					rewardTransaction.outputMap[wallet.publicKey] = 999999;
+					newChain.addBlock([ transaction, rewardTransaction ]);
+					expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(false);
+				});
+			});
+		});
+
+		describe('and the transaction data has at least one malformed input', () => {
+			it('returns false', () => {
+				wallet.balance = 9000;
+
+				const evilOutputMap = {
+					[wallet.publicKey]: 8900,
+					fooRecipient: 100
+				};
+
+				const evilTransaction = {
+					input: {
+						timestamp: Date.now(),
+						amount: wallet.balance,
+						address: wallet.publicKey,
+						signature: wallet.sign(evilOutputMap)
+					},
+					outputMap: evilOutputMap
+				};
+
+				newChain.addBlock([ evilTransaction, rewardTransaction ]);
+				expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(false);
+			});
+		});
+
+		describe('and a block contains multiple identical transactions', () => {
+			it('returns false', () => {
+				newChain.addBlock([ transaction, transaction, transaction, rewardTransaction ]);
+				expect(blockchain.validTransactionData(newChain.chain, wallet)).toBe(false);
 			});
 		});
 	});

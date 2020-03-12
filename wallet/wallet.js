@@ -20,7 +20,7 @@ class Wallet {
 
 	createTransaction(amount, recipient, chain) {
 		if (chain) {
-			this.balance = this.calculateBalance(chain);
+			this.balance = Wallet.calculateBalance(chain, this.publicKey);
 		}
 
 		if (amount > this.balance) {
@@ -29,7 +29,7 @@ class Wallet {
 		return new Transaction(this, recipient, amount);
 	}
 
-	calculateBalance(chain) {
+	static calculateBalance(chain, address) {
 		let hasConductedTransaction = false;
 		let outputsTotal = 0;
 
@@ -37,10 +37,10 @@ class Wallet {
 			const block = chain[i];
 
 			for (let transaction of block.data) {
-				if (transaction.input.address === this.publicKey) {
+				if (transaction.input.address === address) {
 					hasConductedTransaction = true;
 				}
-				const outputValue = transaction.outputMap[this.publicKey];
+				const outputValue = transaction.outputMap[address];
 
 				if (outputValue) {
 					outputsTotal += outputValue;

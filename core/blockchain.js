@@ -1,5 +1,8 @@
 const Block = require('./block');
+const Wallet = require('../wallet/wallet');
+const Transaction = require('../tx/tx');
 const cryptoHash = require('../crypto/crypto-hash');
+const { REWARD_INPUT, MINING_REWARD } = require('../tx/config');
 
 class Blockchain {
 	constructor() {
@@ -52,11 +55,54 @@ class Blockchain {
 			return;
 		}
 
+		if (!this.validTransactionData(newChain)) {
+			console.error('incoming chain has invalid transaction data');
+			return;
+		}
+
 		if (onSuccess) {
 			onSuccess();
 		}
 
 		this.chain = newChain;
+	}
+
+	validTransactionData(chain, wallet) {
+		for (let i = 1; i < chain.length; i++) {
+			const block = chain[i];
+			const transactionSet = new Set();
+			let rewardTransactionCount = 0;
+
+			for (let transaction of block.data) {
+				if (transaction.input.address === REWARD_INPUT.address) {
+					rewardTransactionCount += 1;
+
+					if (rewardTransactionCount > 1) {
+						return false;
+					}
+
+					if (Object.values(transaction.outputMap)[0] !== MINING_REWARD) {
+						return false;
+					}
+				} else {
+					if (!Transaction.validTransaction(transaction)) {
+						return false;
+					}
+
+					const trueBalance = Wallet.calculateBalance(this.chain, transaction.input.address);
+					if (transaction.input.amount !== trueBalance) {
+						return false;
+					}
+
+					if (transactionSet.has(transaction)) {
+						return false;
+					} else {
+						transactionSet.add(transaction);
+					}
+				}
+			}
+		}
+		return true;
 	}
 }
 
