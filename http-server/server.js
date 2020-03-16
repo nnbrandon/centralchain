@@ -15,8 +15,10 @@ const pubsub = new PubSub(blockchain, transactionPool);
 const wallet = new Wallet();
 const transactionMiner = new TransactionMiner(blockchain, transactionPool, wallet, pubsub);
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
+const path = require('path');
 
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.get('/api/blocks', (req, res) => {
 	res.json(blockchain.chain);
@@ -33,9 +35,10 @@ app.get('/api/mine-transactions', (req, res) => {
 });
 
 app.get('/api/wallet', (req, res) => {
+	const address = wallet.publicKey;
 	res.json({
 		address: wallet.publicKey,
-		balance: wallet.calculateBalance(blockchain.chain)
+		balance: Wallet.calculateBalance(blockchain.chain, address)
 	});
 });
 
@@ -66,6 +69,10 @@ app.post('/api/transaction', (req, res) => {
 	console.log(transactionPool);
 	pubsub.broadcastTransaction(transaction);
 	res.json({ transaction });
+});
+
+app.get('*', (req, res) => {
+	res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 const syncWithRootState = () => {

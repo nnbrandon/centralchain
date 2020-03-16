@@ -6,9 +6,11 @@
 	"scripts": {
 		"test": "jest --watchAll",
 		"start": "node http-server/server.js",
-		"dev": "npm run start-redis && nodemon http-server/server.js",
+		"dev": "npm run dev-client & npm run start-redis && nodemon http-server/server.js",
 		"dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon http-server/server.js",
-		"start-redis": "redis-server --daemonize yes"
+		"start-redis": "redis-server --daemonize yes",
+		"dev-client": "npm run clean && parcel client/src/index.html --out-dir client/dist",
+		"clean": "rm -rf .cache client/dist"
 	},
 	"jest": {
 		"testEnvironment": "node"
@@ -31,12 +33,21 @@
 		"npm": "^6.14.1"
 	},
 	"dependencies": {
+		"babel-core": "^6.26.3",
+		"babel-plugin-transform-class-properties": "^6.24.1",
+		"babel-plugin-transform-object-rest-spread": "^6.26.0",
+		"babel-preset-env": "^1.7.0",
+		"babel-preset-react": "^6.24.1",
 		"body-parser": "^1.19.0",
+		"core-js": "^3.6.4",
 		"elliptic": "^6.4.1",
 		"express": "^4.17.1",
 		"hex-to-binary": "^1.0.1",
 		"node-fetch": "^2.6.0",
 		"nodemon": "^2.0.2",
+		"parcel-bundler": "^1.10.3",
+		"react": "^16.6.0",
+		"react-dom": "^16.6.0",
 		"redis": "^2.8.0",
 		"uuid": "^7.0.1"
 	}
