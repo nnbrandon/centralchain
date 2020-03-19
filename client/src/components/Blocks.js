@@ -1,28 +1,19 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { fetchBlocks } from '../actions/Blocks';
 
 class Blocks extends Component {
 	constructor(props) {
 		super(props);
-		this.state = {
-			blocks: []
-		};
 	}
 
 	componentDidMount() {
-		fetch('http://localhost:8080/api/blocks')
-			.then((res) => {
-				return res.json();
-			})
-			.then((json) => {
-				this.setState({ blocks: json });
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		const { dispatch } = this.props;
+		dispatch(fetchBlocks());
 	}
 
 	_renderBlocks() {
-		const { blocks } = this.state;
+		const { blocks } = this.props;
 		return blocks.map((block, idx) => {
 			return <div key={idx}>{block.hash}</div>;
 		});
@@ -32,13 +23,15 @@ class Blocks extends Component {
 		return (
 			<div>
 				<h3>Blocks</h3>
-				{/* {this.state.blocks.map((block) => {
-					return <div key={block.hash}>{block.hash}</div>;
-				})} */}
 				{this._renderBlocks()}
 			</div>
 		);
 	}
 }
 
-export default Blocks;
+const mapStateToProps = (state) => {
+	console.log(state);
+	return { blocks: state.blocks };
+};
+
+export default connect(mapStateToProps)(Blocks);
