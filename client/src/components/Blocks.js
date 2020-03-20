@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchBlocks } from '../actions/Blocks';
+import Block from './Block';
 
 class Blocks extends Component {
 	constructor(props) {
@@ -8,15 +9,19 @@ class Blocks extends Component {
 	}
 
 	componentDidMount() {
-		const { dispatch } = this.props;
-		dispatch(fetchBlocks());
+		this.props.dispatch(fetchBlocks());
 	}
 
 	_renderBlocks() {
 		const { blocks } = this.props;
-		return blocks.map((block, idx) => {
-			return <div key={idx}>{block.hash}</div>;
-		});
+		console.log(blocks.length);
+		if (blocks.length) {
+			return blocks.map((block, idx) => {
+				return <Block key={idx} block={block} />;
+			});
+		} else {
+			return undefined;
+		}
 	}
 
 	render() {
@@ -30,8 +35,9 @@ class Blocks extends Component {
 }
 
 const mapStateToProps = (state) => {
-	console.log(state);
-	return { blocks: state.blocks };
+	return {
+		blocks: state.blockchain.blocks
+	};
 };
 
 export default connect(mapStateToProps)(Blocks);

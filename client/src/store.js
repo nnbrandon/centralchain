@@ -1,7 +1,12 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
 import blocksReducer from '../src/reducers/Blocks';
+import walletReducer from '../src/reducers/Wallet';
 import thunk from 'redux-thunk';
 
-const store = createStore(blocksReducer, applyMiddleware(thunk));
+const rootReducer = combineReducers({
+	blockchain: blocksReducer,
+	wallet: walletReducer
+});
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 export default store;

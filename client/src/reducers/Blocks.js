@@ -7,10 +7,10 @@ const initialState = {
 // avoid mutations in redux
 function blocksReducer(state = initialState, action) {
 	if (action.type === GET_BLOCKS) {
-		console.log(action);
-		return Object.assign({}, state, {
+		console.log(action.payload);
+		return {
 			blocks: action.payload
-		});
+		};
 	}
 	return state;
 }
