@@ -14,7 +14,6 @@ class Blocks extends Component {
 
 	_renderBlocks() {
 		const { blocks } = this.props;
-		console.log(blocks.length);
 		if (blocks.length) {
 			return blocks.map((block, idx) => {
 				return <Block key={idx} block={block} />;
